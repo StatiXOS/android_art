@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1937412_0256cab8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000047
+      },
+      "writtenOn": "2021-05-15T21:47:55Z",
+      "side": 1,
+      "message": "We now use global thinLTO, and LTO with O3 has proven to be better performing with modern compilers.",
+      "revId": "155d86e09ca8f8d8b0a4cbef826b5a346192b065",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6"
+    }
+  ]
+}
