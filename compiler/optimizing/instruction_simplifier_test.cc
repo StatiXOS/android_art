@@ -239,4 +239,20 @@ INSTANTIATE_TEST_SUITE_P(InstructionSimplifierTest,
                                            InstanceOfKind::kUnrelatedUnloaded,
                                            InstanceOfKind::kSupertype));
 
+TEST_F(InstructionSimplifierTest, XorSameValue) {
+  HBasicBlock* main = InitEntryMainExitGraph();
+  HInstruction* param = MakeParam(DataType::Type::kInt32);
+  main->AddInstruction(param);
+  HXor* xor_inst = new (GetAllocator()) HXor(DataType::Type::kInt32, param, param);
+  main->AddInstruction(xor_inst);
+  MakeReturn(main, xor_inst);
+
+  PerformSimplification();
+
+  EXPECT_INS_REMOVED(xor_inst);
+  HInstruction* return_val = main->GetLastInstruction()->InputAt(0);
+  EXPECT_TRUE(return_val->IsIntConstant());
+  EXPECT_EQ(return_val->AsIntConstant()->GetValue(), 0);
+}
+
 }  // namespace art

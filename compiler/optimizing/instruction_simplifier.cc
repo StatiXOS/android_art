@@ -2641,6 +2641,21 @@ void InstructionSimplifierVisitor::VisitXor(HXor* instruction) {
     return;
   }
 
+  // We assume that GVN has run before, so we only perform a pointer comparison.
+  // If for some reason the values are equal but the pointers are different, we
+  // are still correct and only miss an optimization opportunity.
+  if (instruction->GetLeft() == instruction->GetRight()) {
+    // Replace code looking like
+    //    XOR dst, src, src
+    // with
+    //    0
+    HConstant* zero = GetGraph()->GetConstant(instruction->GetType(), 0);
+    instruction->ReplaceWith(zero);
+    instruction->GetBlock()->RemoveInstruction(instruction);
+    RecordSimplification();
+    return;
+  }
+
   if (TryReplaceWithRotate(instruction)) {
     return;
   }
