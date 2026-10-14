@@ -34,11 +34,29 @@ static inline bool DecodeLeb128Helper(const uint8_t** data,
                                       T* out) {
   static_assert(sizeof(T) == 8 || sizeof(T) == 4);
   const uint8_t* ptr = *data;
-  T result = 0;
+  if (end.has_value() && ptr >= end.value()) {
+    return false;
+  }
+
+  // Fast-path for single-byte values (common case: ASCII characters, small integers, small indices).
+  uint8_t byte0 = *ptr;
+  if (LIKELY(byte0 <= 0x7f)) {
+    *data = ptr + 1;
+    if constexpr (std::is_signed_v<T>) {
+      // Sign-extend 7-bit signed value: if bit 6 is set, sign-extend with negative bits.
+      *out = static_cast<T>(static_cast<int8_t>(byte0 << 1) >> 1);
+    } else {
+      *out = static_cast<T>(byte0);
+    }
+    return true;
+  }
+
+  T result = byte0 & 0x7f;
+  ptr++;
   const size_t num_bits = (sizeof(T) * 8);
   // We can encode 7-bits per byte in leb128. So max_bytes is ceil(number_of_bits / 7)
   const size_t max_bytes = (num_bits + 6u) / 7u;
-  for (size_t index = 0; index < max_bytes; ++index) {
+  for (size_t index = 1; index < max_bytes; ++index) {
     if (end.has_value() && ptr >= end.value()) {
       return false;
     }
