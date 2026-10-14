@@ -140,8 +140,8 @@ class LockWord {
   };
 
   static LockWord FromThinLockId(uint32_t thread_id, uint32_t count, uint32_t gc_state) {
-    CHECK_LE(thread_id, static_cast<uint32_t>(kThinLockMaxOwner));
-    CHECK_LE(count, static_cast<uint32_t>(kThinLockMaxCount));
+    DCHECK_LE(thread_id, static_cast<uint32_t>(kThinLockMaxOwner));
+    DCHECK_LE(count, static_cast<uint32_t>(kThinLockMaxCount));
     // DCHECK_EQ(gc_bits & kGCStateMaskToggled, 0U);
     return LockWord((thread_id << kThinLockOwnerShift) |
                     (count << kThinLockCountShift) |
@@ -155,7 +155,7 @@ class LockWord {
   }
 
   static LockWord FromHashCode(uint32_t hash_code, uint32_t gc_state) {
-    CHECK_LE(hash_code, static_cast<uint32_t>(kMaxHash));
+    DCHECK_LE(hash_code, static_cast<uint32_t>(kMaxHash));
     // DCHECK_EQ(gc_bits & kGCStateMaskToggled, 0U);
     return LockWord((hash_code << kHashShift) |
                     (gc_state << kGCStateShift) |
